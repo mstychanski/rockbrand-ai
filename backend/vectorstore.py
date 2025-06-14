@@ -18,26 +18,26 @@ def load_documents() -> List[str]:
         docs.extend(loader.load())
     return docs
 
+# Budowa i obsługa bazy wektorowej (RAG)
+
+# Utrzymuj index FAISS w pamięci (globalnie)
+_faiss_index = None
+
 def build_vectorstore():
+    global _faiss_index
     documents = load_documents()
     # Zamień dokumenty na listę słowników {"filename": ..., "text": ...}
     doc_objs = []
     for doc in documents:
         doc_objs.append({"filename": getattr(doc, 'metadata', {}).get('source', ''), "text": doc.page_content})
-    faiss_index = create_index(doc_objs)
-    # Zapisz index i metadata do pliku (pickle)
-    import pickle
-    with open(VECTOR_DB_PATH, "wb") as f:
-        pickle.dump(faiss_index, f)
-    print(f"Vectorstore saved to {VECTOR_DB_PATH}")
+    _faiss_index = create_index(doc_objs)
+    print("Vectorstore built and stored in memory.")
 
 def load_vectorstore():
-    import pickle
-    with open(VECTOR_DB_PATH, "rb") as f:
-        faiss_index = pickle.load(f)
-    return faiss_index
-
-# Budowa i obsługa bazy wektorowej (RAG)
+    global _faiss_index
+    if _faiss_index is None:
+        build_vectorstore()
+    return _faiss_index
 
 def get_band_context(band_name: str, event: str) -> str:
     faiss_index = load_vectorstore()
