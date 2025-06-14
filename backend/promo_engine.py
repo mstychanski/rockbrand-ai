@@ -32,20 +32,3 @@ def generate_campaign(request: dict) -> dict:
     )
     response = ask_llm(prompt)
     return {"prompt": prompt, "ai_output": response}
-
-# Plik: frontend/streamlit_app.py (skrót)
-import streamlit as st
-from components import promo_planner, merch_designer, calendar_timeline
-
-st.title("RockBrand AI")
-
-tab1, tab2, tab3 = st.tabs(["🎤 Kampanie", "👕 Merch", "🗓 Timeline"])
-
-with tab1:
-    promo_planner.render()
-
-with tab2:
-    merch_designer.render()
-
-with tab3:
-    calendar_timeline.render()
