@@ -1,6 +1,8 @@
 fastapi
 uvicorn
 langchain
+langchain-community
+langchain-openai
 openai
 chromadb
 streamlit
@@ -9,5 +11,3 @@ jinja2
 faiss-cpu
 python-dotenv
 icalendar
-langchain-community
-langchain-openai

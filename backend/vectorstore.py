@@ -5,6 +5,8 @@ from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
+import streamlit as st
+
 DATA_PATH = "data"
 VECTOR_DB_PATH = "data/faiss_index"
 
@@ -21,13 +23,15 @@ def build_vectorstore():
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     split_docs = splitter.split_documents(documents)
 
-    embeddings = OpenAIEmbeddings()
+    api_key = st.secrets["API_KEY"] if hasattr(st, "secrets") and "OPENAI_API_KEY" in st.secrets else os.environ.get("API_KEY")
+    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     vectordb = FAISS.from_documents(split_docs, embeddings)
     vectordb.save_local(VECTOR_DB_PATH)
     print(f"Vectorstore saved to {VECTOR_DB_PATH}")
 
 def load_vectorstore():
-    embeddings = OpenAIEmbeddings()
+    api_key = st.secrets["API_KEY"] if hasattr(st, "secrets") and "API_KEY" in st.secrets else os.environ.get("API_KEY")
+    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     return FAISS.load_local(VECTOR_DB_PATH, embeddings)
 
 # Budowa i obsługa bazy wektorowej (RAG)
