@@ -4,7 +4,7 @@ from typing import List
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
+from backend.embedder import create_index, retrieve_docs
 import streamlit as st
 
 DATA_PATH = "data"
@@ -20,27 +20,30 @@ def load_documents() -> List[str]:
 
 def build_vectorstore():
     documents = load_documents()
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    split_docs = splitter.split_documents(documents)
-
-    api_key = st.secrets["API_KEY"] if hasattr(st, "secrets") and "OPENAI_API_KEY" in st.secrets else os.environ.get("API_KEY")
-    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
-    vectordb = FAISS.from_documents(split_docs, embeddings)
-    vectordb.save_local(VECTOR_DB_PATH)
+    # Zamień dokumenty na listę słowników {"filename": ..., "text": ...}
+    doc_objs = []
+    for doc in documents:
+        doc_objs.append({"filename": getattr(doc, 'metadata', {}).get('source', ''), "text": doc.page_content})
+    faiss_index = create_index(doc_objs)
+    # Zapisz index i metadata do pliku (pickle)
+    import pickle
+    with open(VECTOR_DB_PATH, "wb") as f:
+        pickle.dump(faiss_index, f)
     print(f"Vectorstore saved to {VECTOR_DB_PATH}")
 
 def load_vectorstore():
-    api_key = st.secrets["API_KEY"] if hasattr(st, "secrets") and "API_KEY" in st.secrets else os.environ.get("API_KEY")
-    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
-    return FAISS.load_local(VECTOR_DB_PATH, embeddings, allow_dangerous_deserialization=True)
+    import pickle
+    with open(VECTOR_DB_PATH, "rb") as f:
+        faiss_index = pickle.load(f)
+    return faiss_index
 
 # Budowa i obsługa bazy wektorowej (RAG)
 
 def get_band_context(band_name: str, event: str) -> str:
-    vectordb = load_vectorstore()
+    faiss_index = load_vectorstore()
     query = f"{band_name} {event}"
-    results = vectordb.similarity_search(query, k=3)
-    context = "\n---\n".join([doc.page_content for doc in results])
+    results = retrieve_docs(query, faiss_index, k=3)
+    context = "\n---\n".join([doc["text"] for doc in results])
     return context if context else f"Brak dodatkowego kontekstu dla zespołu {band_name} i wydarzenia {event}."
 
 if __name__ == "__main__":
