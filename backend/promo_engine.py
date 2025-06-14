@@ -11,9 +11,10 @@ Kontekst zespołu i wydarzenia:
 {{ rag_context }}
 
 Wygeneruj:
-- 3 propozycje postów na social media (IG/FB)
-- propozycję notki prasowej
-- krótki teaser e-mailowy do fanów
+- 10 propozycji postów na social media (IG/FB), każdy z sugerowaną datą publikacji,
+- Zwróć wynik jako listę obiektów JSON: [{"date": "YYYY-MM-DD", "content": "..."}],
+- Propozycję notki prasowej,
+- Krótki teaser e-mailowy do fanów
 
 Użyj stylu pasującego do zespołu i wydarzenia. Uwzględnij klimat i emocje.
 """)

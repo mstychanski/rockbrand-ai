@@ -1,5 +1,6 @@
 import streamlit as st
 from backend.promo_engine import generate_campaign
+import json
 
 def render():
     st.header("🎤 Generator kampanii promocyjnej")
@@ -19,4 +20,35 @@ def render():
             st.code(result["prompt"], language="text")
 
             st.subheader("Wynik AI:")
-            st.markdown(result["ai_output"])
+            ai_output = result["ai_output"]
+            # Spróbuj sparsować JSON z postami
+            posts = []
+            press_note = ""
+            teaser = ""
+            try:
+                # Zakładamy, że AI zwraca JSON na początku odpowiedzi
+                start = ai_output.find("[")
+                end = ai_output.find("]")
+                if start != -1 and end != -1:
+                    posts_json = ai_output[start:end+1]
+                    posts = json.loads(posts_json)
+                # Wyciągnij notkę prasową i teaser (prosty heurystyczny podział)
+                press_idx = ai_output.lower().find("notka prasowa")
+                teaser_idx = ai_output.lower().find("teaser")
+                if press_idx != -1 and teaser_idx != -1:
+                    press_note = ai_output[press_idx:teaser_idx].strip()
+                    teaser = ai_output[teaser_idx:].strip()
+            except Exception as e:
+                st.warning(f"Nie udało się sparsować JSON z postami: {e}")
+            if posts:
+                st.markdown("### Propozycje postów:")
+                for post in posts:
+                    st.write(f"📅 {post['date']}: {post['content']}")
+            if press_note:
+                st.markdown("### Notka prasowa:")
+                st.write(press_note)
+            if teaser:
+                st.markdown("### Teaser e-mailowy:")
+                st.write(teaser)
+            if not posts and not press_note and not teaser:
+                st.markdown(ai_output)

@@ -1,56 +1,44 @@
 import streamlit as st
-from datetime import datetime, timedelta
-import requests
-import os
-
-FAKE_EVENTS = [
-    {"title": "Premiera singla", "date": (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')},
-    {"title": "Koncert w Warszawie", "date": (datetime.now() + timedelta(days=10)).strftime('%Y-%m-%d')},
-    {"title": "Drop merchu", "date": (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%d')}
-]
+from backend.promo_engine import generate_campaign
+import json
 
 def render():
     st.header("🗓 Nadchodzące wydarzenia zespołu")
 
-    for event in FAKE_EVENTS:
-        st.write(f"📍 **{event['title']}** — {event['date']}")
+    st.markdown("Wygeneruj kampanię w zakładce 'Kampanie', aby zobaczyć posty na osi czasu.")
 
-    if st.button("📥 Pobierz jako .ics"):
-        with st.spinner("Generuję plik kalendarza..."):
-            response = requests.post("http://localhost:8000/generate-ics", json={"events": FAKE_EVENTS})
-            if response.status_code == 200:
-                result = response.json()
-                if result["status"] == "success":
-                    with open(result["ics_file"], "rb") as f:
-                        st.download_button(
-                            label="📅 Pobierz RockBand.ics",
-                            data=f.read(),
-                            file_name="RockBandEvents.ics",
-                            mime="text/calendar"
-                        )
-                else:
-                    st.error(f"Błąd: {result['message']}")
-            else:
-                st.error("Nie udało się wygenerować pliku .ics")
+    # Przechowuj wynik AI w stanie sesji
+    if "promo_result" not in st.session_state:
+        st.session_state["promo_result"] = None
 
-    st.header("Timeline wydarzeń")
-    # Przykładowe dane wydarzeń
-    events = [
-        {"date": "2024-06-01", "title": "Premiera singla", "desc": "Nowy singiel już dostępny!"},
-        {"date": "2024-06-10", "title": "Koncert w Warszawie", "desc": "Klub Stodoła, godz. 20:00"},
-        {"date": "2024-07-05", "title": "Start przedsprzedaży merchu", "desc": "Nowa kolekcja koszulek"},
-    ]
-    # Sortowanie po dacie
-    events = sorted(events, key=lambda e: e["date"])
-    # Wizualizacja osi czasu
-    for event in events:
-        st.markdown(
-            f"""
-            <div style="border-left: 3px solid #888; padding-left: 12px; margin-bottom: 18px;">
-                <span style="color: #888;">{event['date']}</span><br>
-                <b>{event['title']}</b><br>
-                <span>{event['desc']}</span>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+    # Przycisk do pobrania danych z kampanii
+    if st.button("🔄 Załaduj posty z ostatniej kampanii"):
+        # Załaduj ostatni wynik z promo_planner (jeśli był generowany)
+        try:
+            from backend.promo_engine import generate_campaign
+            # Możesz tu pobrać dane z sesji lub innego źródła, jeśli są dostępne
+            # Tu tylko przykład: pobierz z sesji promo_result
+            pass
+        except Exception as e:
+            st.error(f"Błąd podczas ładowania postów: {e}")
+
+    # Wyświetl posty jeśli są w stanie sesji
+    if st.session_state["promo_result"]:
+        ai_output = st.session_state["promo_result"]["ai_output"]
+        posts = []
+        try:
+            start = ai_output.find("[")
+            end = ai_output.find("]")
+            if start != -1 and end != -1:
+                posts_json = ai_output[start:end+1]
+                posts = json.loads(posts_json)
+        except Exception as e:
+            st.warning(f"Nie udało się sparsować JSON z postami: {e}")
+        if posts:
+            st.markdown("### Propozycje postów:")
+            for post in posts:
+                st.write(f"📅 {post['date']}: {post['content']}")
+        else:
+            st.info("Brak postów do wyświetlenia. Wygeneruj kampanię w zakładce 'Kampanie'.")
+    else:
+        st.info("Brak danych do wyświetlenia. Wygeneruj kampanię w zakładce 'Kampanie'.")
