@@ -13,5 +13,3 @@ python-dotenv
 icalendar
 langchain-huggingface
 sentence-transformers
-torch==2.2.2
-transformers==4.40.2
