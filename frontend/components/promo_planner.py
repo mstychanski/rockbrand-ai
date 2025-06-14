@@ -1,5 +1,5 @@
 import streamlit as st
-import requests
+from backend.promo_engine import generate_campaign
 
 def render():
     st.header("🎤 Generator kampanii promocyjnej")
@@ -10,17 +10,13 @@ def render():
 
     if st.button("Wygeneruj kampanię"):
         with st.spinner("Generuję..."):
-            response = requests.post("http://localhost:8000/generate-promo", json={
+            result = generate_campaign({
                 "band_name": band_name,
                 "genre": genre,
                 "event": event
             })
-            if response.status_code == 200:
-                result = response.json()
-                st.subheader("Prompt:")
-                st.code(result["prompt"], language="text")
+            st.subheader("Prompt:")
+            st.code(result["prompt"], language="text")
 
-                st.subheader("Wynik AI:")
-                st.markdown(result["ai_output"])
-            else:
-                st.error("Nie udało się wygenerować kampanii.")
+            st.subheader("Wynik AI:")
+            st.markdown(result["ai_output"])

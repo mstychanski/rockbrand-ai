@@ -1,5 +1,5 @@
 import streamlit as st
-import requests
+from backend.merch_engine import generate_merch_items
 
 def render():
     st.header("👕 Generator merchu i opisów")
@@ -10,14 +10,12 @@ def render():
 
     if st.button("Wygeneruj merch"):
         with st.spinner("Generuję..." ):
-            response = requests.post("http://localhost:8000/generate-merch", json={
+            result = generate_merch_items({
                 "band_name": band_name,
                 "style": style,
                 "product": product
             })
-            if response.status_code == 200:
-                result = response.json()
-                st.subheader("Opis AI:")
-                st.markdown(result["ai_output"])
-            else:
-                st.error("Nie udało się wygenerować merchu.")
+            st.subheader("Prompt:")
+            st.code(result.get("prompt", ""), language="text")
+            st.subheader("Opis AI:")
+            st.markdown(result.get("ai_output", str(result)))
