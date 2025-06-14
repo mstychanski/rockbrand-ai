@@ -1,7 +1,7 @@
 import os
 import glob
 from typing import List
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
