@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+langchain
+openai
+chromadb
+streamlit
+pydantic
+jinja2
+faiss-cpu
+python-dotenv
+icalendar
