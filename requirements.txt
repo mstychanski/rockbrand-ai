@@ -11,3 +11,4 @@ jinja2
 faiss-cpu
 python-dotenv
 icalendar
+langchain-huggingface
