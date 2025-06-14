@@ -6,10 +6,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Use Streamlit secrets for API key and model
+BASE_URL = st.secrets["BASE_URL"]
 API_KEY = st.secrets["API_KEY"]
 MODEL = st.secrets["MODEL"]
 
-client = OpenAI(api_key=API_KEY)
+client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
 def ask_llm(prompt: str) -> str:
     try:
