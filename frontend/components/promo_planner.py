@@ -16,6 +16,9 @@ def render():
                 "genre": genre,
                 "event": event
             })
+            # Zapisz wynik do session_state, aby był dostępny w calendar_timeline
+            st.session_state["promo_result"] = result
+
             st.subheader("Prompt:")
             st.code(result["prompt"], language="text")
 
