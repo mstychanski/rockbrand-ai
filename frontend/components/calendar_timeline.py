@@ -1,5 +1,4 @@
 import streamlit as st
-from backend.promo_engine import generate_campaign
 import json
 
 def render():
@@ -13,14 +12,12 @@ def render():
 
     # Przycisk do pobrania danych z kampanii
     if st.button("🔄 Załaduj posty z ostatniej kampanii"):
-        # Załaduj ostatni wynik z promo_planner (jeśli był generowany)
-        try:
-            from backend.promo_engine import generate_campaign
-            # Możesz tu pobrać dane z sesji lub innego źródła, jeśli są dostępne
-            # Tu tylko przykład: pobierz z sesji promo_result
+        # Pobierz dane z sesji promo_result, jeśli są dostępne
+        if "promo_result" in st.session_state and st.session_state["promo_result"]:
+            # Odświeżenie widoku nastąpi automatycznie po kliknięciu przycisku
             pass
-        except Exception as e:
-            st.error(f"Błąd podczas ładowania postów: {e}")
+        else:
+            st.warning("Brak danych kampanii do załadowania.")
 
     # Wyświetl posty jeśli są w stanie sesji
     if st.session_state["promo_result"]:
