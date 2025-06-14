@@ -32,7 +32,7 @@ def build_vectorstore():
 def load_vectorstore():
     api_key = st.secrets["API_KEY"] if hasattr(st, "secrets") and "API_KEY" in st.secrets else os.environ.get("API_KEY")
     embeddings = OpenAIEmbeddings(openai_api_key=api_key)
-    return FAISS.load_local(VECTOR_DB_PATH, embeddings)
+    return FAISS.load_local(VECTOR_DB_PATH, embeddings, allow_dangerous_deserialization=True)
 
 # Budowa i obsługa bazy wektorowej (RAG)
 
