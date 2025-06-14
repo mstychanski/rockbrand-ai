@@ -23,7 +23,7 @@ def generate_campaign(request: dict) -> dict:
     band_name = request.get("band_name", "Nieznany Zespół")
     genre = request.get("genre", "rock alternatywny")
     event = request.get("event", "premiera singla")
-    # Pobierz kontekst z RAG
+
     rag_context = get_band_context(band_name=band_name, event=event)
     prompt = PROMO_TEMPLATE.render(
         band_name=band_name,

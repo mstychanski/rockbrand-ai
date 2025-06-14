@@ -29,13 +29,13 @@ def render():
             press_note = ""
             teaser = ""
             try:
-                # Zakładamy, że AI zwraca JSON na początku odpowiedzi
                 start = ai_output.find("[")
                 end = ai_output.find("]")
                 if start != -1 and end != -1:
                     posts_json = ai_output[start:end+1]
                     posts = json.loads(posts_json)
-                # Wyciągnij notkę prasową i teaser (prosty heurystyczny podział)
+                
+                # Wyciągnij notkę prasową i teaser
                 press_idx = ai_output.lower().find("notka prasowa")
                 teaser_idx = ai_output.lower().find("teaser")
                 if press_idx != -1 and teaser_idx != -1:

@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Use Streamlit secrets for API key and model
 BASE_URL = st.secrets["BASE_URL"]
 API_KEY = st.secrets["API_KEY"]
 MODEL = st.secrets["MODEL"]

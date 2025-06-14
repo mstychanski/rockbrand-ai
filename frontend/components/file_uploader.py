@@ -14,6 +14,7 @@ def render():
         with open(save_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
         st.success(f"Plik {uploaded_file.name} został zapisany w {save_path}")
+        
         # Przebuduj bazę wektorową po wgraniu pliku
         with st.spinner("Przebudowywanie bazy wektorowej..."):
             vectorstore_path = os.path.join(BACKEND_PATH, "vectorstore.py")
