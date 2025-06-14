@@ -16,7 +16,8 @@ def render():
         st.success(f"Plik {uploaded_file.name} został zapisany w {save_path}")
         # Przebuduj bazę wektorową po wgraniu pliku
         with st.spinner("Przebudowywanie bazy wektorowej..."):
-            result = os.system(f'python "{os.path.join(BACKEND_PATH, 'vectorstore.py')}"')
+            vectorstore_path = os.path.join(BACKEND_PATH, "vectorstore.py")
+            result = os.system(f'python "{vectorstore_path}"')
         if result == 0:
             st.success("Baza wektorowa została przebudowana.")
         else:
